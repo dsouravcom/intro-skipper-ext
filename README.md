@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="icons/icon128.png" alt="Intro Skipper Logo" width="128" height="128">
+<img src="chrome/icons/icon128.png" alt="Intro Skipper Logo" width="128" height="128">
 
 # Intro Skipper
 
@@ -268,7 +268,7 @@ We welcome contributions from the community! Here's how you can help improve the
         "js": ["content-scripts/[service-name].js"],
         "run_at": "document_idle"
     }
-    ```3. Implement skip detection logic:
+3. Implement skip detection logic:
     ```javascript
     // Follow existing patterns in netflix.js or crunchyroll.js
     const SERVICE_NAME = "ServiceName";
