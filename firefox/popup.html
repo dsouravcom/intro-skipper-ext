@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <style>
+            body {
+                width: 280px;
+                padding: 20px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    Roboto, sans-serif;
+                background: #1a1a1a;
+                color: white;
+                margin: 0;
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .logo {
+                font-size: 18px;
+                font-weight: bold;
+                color: #ff6b35;
+                margin-bottom: 5px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+                color: #999;
+            }
+
+            .toggle-container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin: 20px 0;
+                padding: 15px;
+                background: #2a2a2a;
+                border-radius: 8px;
+            }
+
+            .toggle-label {
+                font-size: 14px;
+                color: #fff;
+            }
+
+            .toggle-switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+            }
+
+            .toggle-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #666;
+                transition: 0.4s;
+                border-radius: 24px;
+            }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: 0.4s;
+                border-radius: 50%;
+            }
+
+            input:checked + .slider {
+                background-color: #ff6b35;
+            }
+
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+
+            .status {
+                text-align: center;
+                font-size: 12px;
+                color: #999;
+                margin: 15px 0;
+            }
+
+            .status.enabled {
+                color: #46d369;
+            }
+
+            .status.disabled {
+                color: #f40612;
+            }
+
+            .manage-btn {
+                width: 100%;
+                padding: 12px;
+                background: #ff6b35;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                margin-top: 10px;
+            }
+
+            .manage-btn:hover {
+                background: #e55a2e;
+            }
+
+            .current-site {
+                background: #2a2a2a;
+                padding: 10px;
+                border-radius: 6px;
+                margin: 10px 0;
+                font-size: 12px;
+            }
+
+            .site-name {
+                color: #ff6b35;
+                font-weight: 500;
+            }
+
+            .site-status {
+                margin-top: 5px;
+                color: #999;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="logo">Intro Skipper</div>
+            <div class="subtitle">Auto-skip for all streaming services</div>
+        </div>
+
+        <div class="toggle-container">
+            <span class="toggle-label">Global Auto Skip</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="globalToggle" />
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="status" id="status">Loading...</div>
+
+        <button class="manage-btn" id="manageBtn">Manage Services</button>
+
+        <script src="popup.js"></script>
+    </body>
+</html>

@@ -1,0 +1,35 @@
+{
+    "sourceDir": ".",
+    "artifactsDir": "dist",
+    "ignoreFiles": [
+        "*.md",
+        "package*.json",
+        "web-ext-config.json",
+        ".git/**",
+        "dist/**",
+        "node_modules/**",
+        "*.log",
+        "*.zip"
+    ],
+    "build": {
+        "overwriteDest": true,
+        "filename": "intro-skipper-firefox-{version}.zip"
+    },
+    "run": {
+        "firefox": "firefox",
+        "browserConsole": true,
+        "startUrl": [
+            "about:debugging#/runtime/this-firefox",
+            "https://netflix.com",
+            "https://crunchyroll.com"
+        ],
+        "pref": {
+            "extensions.webextensions.tabhide.enabled": true,
+            "devtools.console.stdout.content": true
+        }
+    },
+    "lint": {
+        "pretty": true,
+        "warningsAsErrors": false
+    }
+}

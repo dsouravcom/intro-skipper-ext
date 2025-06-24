@@ -1,0 +1,13 @@
+{
+    "ignore": [
+        "node_modules/**",
+        "dist/**",
+        "*.log",
+        "*.zip",
+        "*.xpi",
+        ".git/**",
+        ".vscode/**",
+        "package-lock.json",
+        "yarn.lock"
+    ]
+}

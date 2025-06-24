@@ -1,0 +1,50 @@
+{
+    "name": "intro-skipper-firefox",
+    "version": "0.0.1",
+    "description": "Firefox extension that automatically skips intros on streaming platforms",
+    "scripts": {
+        "build": "web-ext build --source-dir . --artifacts-dir dist",
+        "start": "web-ext run --source-dir .",
+        "lint": "web-ext lint --source-dir .",
+        "sign": "web-ext sign --source-dir . --artifacts-dir dist",
+        "validate": "npm run build && powershell -Command \"Get-ChildItem dist/*.zip | ForEach-Object { addons-linter $_.FullName }\""
+    },
+    "devDependencies": {
+        "web-ext": "^7.9.0",
+        "addons-linter": "^6.21.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dsouravcom/intro-skipper-ext.git"
+    },
+    "keywords": [
+        "firefox",
+        "extension",
+        "addon",
+        "netflix",
+        "crunchyroll",
+        "intro",
+        "skip",
+        "streaming"
+    ],
+    "author": "Sourav Dutta <sourav@dsourav.com>",
+    "license": "GPL-3.0",
+    "webExt": {
+        "sourceDir": ".",
+        "artifactsDir": "dist",
+        "build": {
+            "overwriteDest": true
+        },
+        "run": {
+            "firefox": "firefox",
+            "browserConsole": true,
+            "startUrl": [
+                "https://netflix.com",
+                "https://crunchyroll.com"
+            ]
+        },
+        "sign": {
+            "channel": "unlisted"
+        }
+    }
+}
