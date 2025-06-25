@@ -3,7 +3,7 @@
     "name": "Intro Skipper",
     "version": "0.0.1",
     "description": "Automatically skip intros on Netflix, Crunchyroll and other streaming services",
-    "permissions": ["storage", "activeTab", "tabs"],
+    "permissions": ["storage", "activeTab"],
     "host_permissions": ["https://*/*"],
     "background": {
         "service_worker": "background.js"

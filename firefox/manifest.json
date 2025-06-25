@@ -13,7 +13,6 @@
     "permissions": [
         "storage",
         "activeTab",
-        "tabs",
         "*://*.netflix.com/*",
         "*://*.crunchyroll.com/*"
     ],
