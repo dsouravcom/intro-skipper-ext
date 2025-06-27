@@ -16,8 +16,8 @@
 
 | Browser                                                                                                         | Download Link         | Status      |
 | --------------------------------------------------------------------------------------------------------------- | --------------------- | ----------- |
-| ![Chrome](https://img.shields.io/badge/Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)     | [Chrome Web Store](#) | Coming Soon |
-| ![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefoxbrowser&logoColor=white) | [Firefox Add-ons](#)  | Coming Soon |
+| ![Chrome](https://img.shields.io/badge/Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)     | [Chrome Web Store](https://chromewebstore.google.com/detail/cdmmdficgnfnennlmjieepedoamgppgk) | ✅ Available |
+| ![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefoxbrowser&logoColor=white) | [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/universal-intro-skipper/)  | ✅ Available |
 
 </div>
 
