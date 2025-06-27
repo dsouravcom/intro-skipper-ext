@@ -14,10 +14,10 @@
 
 <div align="center">
 
-| Browser                                                                                                         | Download Link         | Status      |
-| --------------------------------------------------------------------------------------------------------------- | --------------------- | ----------- |
+| Browser                                                                                                         | Download Link                                                                                 | Status       |
+| --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------ |
 | ![Chrome](https://img.shields.io/badge/Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)     | [Chrome Web Store](https://chromewebstore.google.com/detail/cdmmdficgnfnennlmjieepedoamgppgk) | ✅ Available |
-| ![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefoxbrowser&logoColor=white) | [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/universal-intro-skipper/)  | ✅ Available |
+| ![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefoxbrowser&logoColor=white) | [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/universal-intro-skipper/)    | ✅ Available |
 
 </div>
 
@@ -84,6 +84,37 @@ _🔄 More services coming soon! [Request a service](https://github.com/dsouravc
 🔒 **Privacy First** - No data collection or external requests  
 ⚡ **Lightweight** - Optimized for minimal resource usage  
 🎨 **Clean Interface** - Modern, intuitive settings panel
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+
+<table>
+<tr>
+<td align="center">
+<img src="screenshots/page-1.jpeg" alt="Extension Popup Interface" width="300"><br>
+<sub><b>Extension Popup Interface</b></sub>
+</td>
+<td align="center">
+<img src="screenshots/page-2.jpeg" alt="Settings Panel" width="300"><br>
+<sub><b>Settings Panel</b></sub>
+</td>
+<td align="center">
+<img src="screenshots/page-3.jpeg" alt="turn off/on a specific service" width="300"><br>
+<sub><b>turn off/on a specific service</b></sub>
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="screenshots/page-4.jpeg" alt="turn off/on all services" width="300"><br>
+<sub><b>turn off/on all services</b></sub>
+</td>
+</tr>
+</table>
+
+</div>
 
 ---
 
@@ -262,21 +293,24 @@ We welcome contributions from the community! Here's how you can help improve the
 
     **Firefox manifest.json:**
 
-    ````json
+    ```json
     {
         "matches": ["*://[service-domain]/*"],
         "js": ["content-scripts/[service-name].js"],
         "run_at": "document_idle"
     }
+    ```
+
 3. Implement skip detection logic:
+
     ```javascript
     // Follow existing patterns in netflix.js or crunchyroll.js
     const SERVICE_NAME = "ServiceName";
     const SKIP_SELECTORS = ["service-specific-selectors"];
-    ````
+    ```
 
-3. Add service to `manage.js` DETECTED_SERVICES object in both browser directories
-4. Test in both Chrome and Firefox environments
+4. Add service to `manage.js` DETECTED_SERVICES object in both browser directories
+5. Test in both Chrome and Firefox environments
 
 **Improving Detection Logic:**
 
@@ -335,8 +369,6 @@ async function loadSettings() {
 -   [ ] Cross-browser compatibility verified
 -   [ ] Doesn't conflict with other extensions
 
-
-
 ### 🔄 Pull Request Process
 
 1. **Create Feature Branch**
@@ -385,7 +417,6 @@ async function loadSettings() {
     - Include testing notes for both Chrome and Firefox
     - Add screenshots for UI changes
     - Mention any browser-specific considerations
-
 
 ### 📝 Documentation
 
