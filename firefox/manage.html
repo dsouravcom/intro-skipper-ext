@@ -4,6 +4,22 @@
         <meta charset="utf-8" />
         <title>Intro Skipper - Settings</title>
         <style>
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap");
+
+            :root {
+                --color-primary: #475569;
+                --color-secondary: #1e293b;
+                --color-accent: #94a3b8;
+                --color-background: #f8fafc;
+                --color-surface: #ffffff;
+                --color-border: #e2e8f0;
+                --color-success: #10b981;
+                --color-error: #ef4444;
+                --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+                --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+                    0 2px 4px -2px rgb(0 0 0 / 0.1);
+            }
+
             * {
                 margin: 0;
                 padding: 0;
@@ -11,180 +27,168 @@
             }
 
             body {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                    Roboto, sans-serif;
-                background: #0f0f0f;
-                color: #ffffff;
+                font-family: "Inter", -apple-system, BlinkMacSystemFont,
+                    "Segoe UI", Roboto, sans-serif;
+                background: var(--color-background);
+                color: var(--color-secondary);
                 line-height: 1.6;
                 min-height: 100vh;
+                padding: 32px 24px;
             }
 
             .container {
-                max-width: 1000px;
+                max-width: 800px;
                 margin: 0 auto;
-                padding: 32px 24px;
             }
 
             .header {
                 text-align: center;
                 margin-bottom: 48px;
-                padding-bottom: 32px;
-                border-bottom: 2px solid #2a2a2a;
             }
 
             .header h1 {
-                color: #ff6b35;
+                font-family: "Playfair Display", serif;
                 font-size: 32px;
                 font-weight: 700;
-                margin-bottom: 12px;
-                letter-spacing: -0.5px;
+                color: var(--color-secondary);
+                margin-bottom: 8px;
             }
 
             .header p {
-                color: #888888;
-                font-size: 18px;
-                font-weight: 400;
+                color: var(--color-accent);
+                font-size: 16px;
             }
 
-            .global-toggle {
-                background: #1a1a1a;
-                border: 2px solid #2a2a2a;
+            .global-control {
+                background: var(--color-surface);
                 border-radius: 16px;
                 padding: 24px;
+                box-shadow: var(--shadow);
+                border: 1px solid var(--color-border);
                 margin-bottom: 32px;
-                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
             }
 
-            .global-toggle h2 {
-                color: #ffffff;
-                font-size: 20px;
-                margin-bottom: 16px;
+            .control-label h2 {
+                font-size: 18px;
+                font-weight: 600;
+                margin-bottom: 4px;
             }
 
-            .global-switch {
+            .control-label p {
+                color: var(--color-accent);
+                font-size: 14px;
+            }
+
+            /* Toggle Switch */
+            .switch {
                 position: relative;
                 display: inline-block;
-                width: 72px;
-                height: 36px;
+                width: 52px;
+                height: 28px;
             }
 
-            .global-switch input {
+            .switch input {
                 opacity: 0;
                 width: 0;
                 height: 0;
             }
 
-            .global-slider {
+            .slider {
                 position: absolute;
                 cursor: pointer;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background-color: #444444;
-                transition: 0.3s ease;
-                border-radius: 36px;
+                background-color: #cbd5e1;
+                transition: 0.3s;
+                border-radius: 34px;
             }
 
-            .global-slider:before {
+            .slider:before {
                 position: absolute;
                 content: "";
-                height: 28px;
-                width: 28px;
+                height: 20px;
+                width: 20px;
                 left: 4px;
                 bottom: 4px;
-                background-color: #ffffff;
-                transition: 0.3s ease;
+                background-color: white;
+                transition: 0.3s;
                 border-radius: 50%;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             }
 
-            input:checked + .global-slider {
-                background-color: #ff6b35;
+            input:checked + .slider {
+                background-color: var(--color-primary);
             }
 
-            input:checked + .global-slider:before {
-                transform: translateX(36px);
+            input:checked + .slider:before {
+                transform: translateX(24px);
             }
 
-            .contact-info {
-                background: #1a1a1a;
-                border: 1px solid #2a2a2a;
-                padding: 24px;
-                border-radius: 16px;
-                margin-bottom: 32px;
-                text-align: center;
-            }
-
-            .contact-info h3 {
-                color: #ff6b35;
-                font-size: 18px;
-                margin-bottom: 12px;
-            }
-
-            .contact-info p {
-                color: #cccccc;
-                font-size: 15px;
-                line-height: 1.5;
-            }
-
-            .contact-info a {
-                color: #ff6b35;
-                text-decoration: none;
-                font-weight: 500;
-            }
-
-            .contact-info a:hover {
-                text-decoration: underline;
-            }
-
-            .service-grid {
+            /* Services Grid */
+            .services-grid {
                 display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
                 gap: 24px;
-                grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             }
 
             .service-card {
-                background: #1a1a1a;
-                border: 1px solid #2a2a2a;
-                border-radius: 16px;
-                padding: 28px;
-                transition: all 0.2s ease;
+                background: var(--color-surface);
+                border-radius: 12px;
+                padding: 20px;
+                box-shadow: var(--shadow-sm);
+                border: 1px solid var(--color-border);
+                transition: all 0.3s ease;
             }
 
             .service-card:hover {
-                border-color: #3a3a3a;
                 transform: translateY(-2px);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                box-shadow: var(--shadow);
+            }
+
+            .service-card.disabled {
+                opacity: 0.6;
+                pointer-events: none;
+            }
+
+            .service-card.service-disabled {
+                opacity: 0.8;
             }
 
             .service-header {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
-                margin-bottom: 24px;
-                padding-bottom: 20px;
-                border-bottom: 1px solid #2a2a2a;
+                align-items: flex-start;
+                margin-bottom: 20px;
             }
 
             .service-info h3 {
-                color: #ffffff;
-                font-size: 20px;
+                font-size: 18px;
                 font-weight: 600;
-                margin-bottom: 6px;
+                margin-bottom: 4px;
             }
 
             .service-domain {
-                color: #888888;
-                font-size: 14px;
-                font-weight: 500;
+                font-size: 12px;
+                color: var(--color-accent);
+                background: #f1f5f9;
+                padding: 2px 8px;
+                border-radius: 12px;
+                display: inline-block;
             }
 
+            /* Reuse switch styles for service toggle but smaller if needed, 
+           but manage.js generates HTML with class "service-toggle" wrapping input and "toggle-slider" span.
+        */
             .service-toggle {
                 position: relative;
                 display: inline-block;
-                width: 64px;
-                height: 32px;
+                width: 44px;
+                height: 24px;
             }
 
             .service-toggle input {
@@ -200,312 +204,133 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background-color: #444444;
-                transition: 0.3s ease;
-                border-radius: 32px;
+                background-color: #cbd5e1;
+                transition: 0.3s;
+                border-radius: 24px;
             }
 
             .toggle-slider:before {
                 position: absolute;
                 content: "";
-                height: 26px;
-                width: 26px;
+                height: 18px;
+                width: 18px;
                 left: 3px;
                 bottom: 3px;
-                background-color: #ffffff;
-                transition: 0.3s ease;
+                background-color: white;
+                transition: 0.3s;
                 border-radius: 50%;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             }
 
-            input:checked + .toggle-slider {
-                background-color: #ff6b35;
+            .service-checkbox:checked + .toggle-slider {
+                background-color: var(--color-primary);
             }
 
-            input:checked + .toggle-slider:before {
-                transform: translateX(32px);
+            .service-checkbox:checked + .toggle-slider:before {
+                transform: translateX(20px);
             }
 
             .buttons-grid {
                 display: grid;
-                gap: 16px;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 12px;
             }
 
             .button-item {
-                background: #0f0f0f;
-                padding: 20px;
-                border-radius: 12px;
-                border: 1px solid #2a2a2a;
+                background: #f8fafc;
+                border: 1px solid var(--color-border);
+                border-radius: 8px;
+                padding: 12px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                transition: all 0.2s ease;
             }
 
-            .button-item:hover {
-                border-color: #3a3a3a;
-                background: #151515;
-            }
-
-            .button-info {
-                flex: 1;
+            .button-item.disabled {
+                opacity: 0.5;
             }
 
             .button-text {
-                color: #ffffff;
-                font-weight: 600;
-                font-size: 15px;
-                margin-bottom: 4px;
+                font-weight: 500;
+                font-size: 14px;
             }
 
             .button-type {
-                color: #888888;
-                font-size: 12px;
+                font-size: 11px;
+                color: var(--color-accent);
                 text-transform: uppercase;
-                font-weight: 500;
                 letter-spacing: 0.5px;
             }
 
-            .button-toggle {
-                position: relative;
-                display: inline-block;
-                width: 52px;
-                height: 26px;
-            }
-
-            .button-toggle input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-
-            .button-slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #444444;
-                transition: 0.3s ease;
-                border-radius: 26px;
-            }
-
-            .button-slider:before {
-                position: absolute;
-                content: "";
-                height: 20px;
-                width: 20px;
-                left: 3px;
-                bottom: 3px;
-                background-color: #ffffff;
-                transition: 0.3s ease;
-                border-radius: 50%;
-                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-            }
-
-            input:checked + .button-slider {
-                background-color: #ff6b35;
-            }
-
-            input:checked + .button-slider:before {
-                transform: translateX(26px);
-            }
-            .button-item.disabled {
-                opacity: 0.5;
-                pointer-events: none;
-            }
-
-            .service-card.disabled {
-                opacity: 0.6;
-                filter: grayscale(20%);
-                pointer-events: none;
-            }
-
-            .service-card.disabled .service-info h3 {
-                color: #666666;
-            }
-
-            .service-card.disabled .service-domain {
-                color: #555555;
-            }
-
-            .service-card.disabled .toggle-slider {
-                background-color: #333333 !important;
-                cursor: not-allowed;
-            }
-
-            .service-card.disabled .button-slider {
-                background-color: #333333 !important;
-                cursor: not-allowed;
-            }
-
-            .service-card.disabled .button-text {
-                color: #666666;
-            }
-
-            .service-card.disabled .button-type {
-                color: #555555;
-            }
-
-            /* Service-specific settings */
-            .service-settings {
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 1px solid #2a2a2a;
-            }
-
-            .setting-item {
-                margin-bottom: 16px;
-            }
-
-            .setting-item label {
-                display: block;
-                color: #cccccc;
-                font-size: 14px;
-                font-weight: 500;
-                margin-bottom: 6px;
-            }
-
-            .setting-input {
-                width: 120px;
-                padding: 8px 12px;
-                background: #2a2a2a;
-                border: 1px solid #3a3a3a;
-                border-radius: 6px;
-                color: #ffffff;
-                font-size: 14px;
-                transition: all 0.2s ease;
-            }
-
-            .setting-input:focus {
-                outline: none;
-                border-color: #ff6b35;
-                background: #333333;
-            }
-
-            .setting-input:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
-
-            .setting-description {
-                display: block;
-                color: #888888;
+            .button-status {
                 font-size: 12px;
-                margin-top: 4px;
-                font-style: italic;
-            }
-
-            .back-btn {
-                position: fixed;
-                top: 24px;
-                left: 24px;
-                background: #1a1a1a;
-                color: #ffffff;
-                border: 1px solid #2a2a2a;
-                padding: 14px 20px;
-                border-radius: 10px;
-                cursor: pointer;
-                font-size: 14px;
-                font-weight: 500;
-                transition: all 0.2s ease;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .back-btn:hover {
-                background: #2a2a2a;
-                border-color: #3a3a3a;
-                transform: translateY(-1px);
+                font-weight: 600;
+                color: var(--color-primary);
             }
 
             .status-message {
                 position: fixed;
-                top: 24px;
+                bottom: 24px;
                 right: 24px;
-                padding: 16px 24px;
-                border-radius: 12px;
-                font-size: 14px;
+                padding: 12px 24px;
+                border-radius: 8px;
+                color: white;
                 font-weight: 500;
                 display: none;
-                z-index: 1000;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                animation: slideIn 0.3s ease;
+                z-index: 100;
+                box-shadow: var(--shadow);
             }
 
             .status-success {
-                background: #22c55e;
-                color: #ffffff;
+                background-color: var(--color-primary);
             }
 
             .status-error {
-                background: #ef4444;
-                color: #ffffff;
+                background-color: var(--color-error);
             }
 
-            .loading {
-                text-align: center;
-                padding: 60px;
-                color: #888888;
-                font-size: 16px;
-            }
-
-            @media (max-width: 768px) {
-                .service-grid {
-                    grid-template-columns: 1fr;
+            @keyframes slideIn {
+                from {
+                    transform: translateY(100%);
+                    opacity: 0;
                 }
-
-                .container {
-                    padding: 24px 16px;
-                }
-
-                .back-btn {
-                    position: static;
-                    margin-bottom: 24px;
-                    width: fit-content;
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
                 }
             }
         </style>
     </head>
     <body>
-        <div class="status-message" id="statusMessage"></div>
-
         <div class="container">
             <div class="header">
-                <h1>Intro Skipper Settings</h1>
-                <p>Configure auto-skip preferences for streaming services</p>
+                <img
+                    src="icons/icon96.png"
+                    alt="Logo"
+                    style="width: 64px; height: 64px; margin-bottom: 16px"
+                />
+                <h1>Intro Skipper</h1>
+                <p>Manage your auto-skip preferences</p>
             </div>
 
-            <div class="global-toggle">
-                <h2>Master Control</h2>
-                <label class="global-switch">
+            <div class="global-control">
+                <div class="control-label">
+                    <h2>Master Switch</h2>
+                    <p>Enable or disable the extension globally</p>
+                </div>
+                <label class="switch">
                     <input type="checkbox" id="masterToggle" />
-                    <span class="global-slider"></span>
+                    <span class="slider"></span>
                 </label>
             </div>
 
-            <div class="contact-info">
-                <h3>Want to Add a New Service?</h3>
-                <p>
-                    Request new streaming services by contacting us:<br />
-                    <strong>GitHub:</strong>
-                    <a
-                        href="https://github.com/dsouravcom/intro-skipper-ext/issues/new"
-                        target="_blank"
-                        >Open an Issue</a
-                    >
-                    |
-                    <strong>Email:</strong>
-                    <a href="mailto:sourav@dsourav.com">sourav@dsourav.com</a>
-                </p>
-            </div>
-
-            <div id="servicesContainer" class="service-grid">
-                <div class="loading">Loading services...</div>
+            <div id="servicesContainer" class="services-grid">
+                <!-- Services will be injected here -->
             </div>
         </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
         <script src="manage.js"></script>
     </body>
 </html>

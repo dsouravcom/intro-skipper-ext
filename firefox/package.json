@@ -1,6 +1,6 @@
 {
     "name": "intro-skipper-firefox",
-    "version": "0.0.1",
+    "version": "0.0.5",
     "description": "Firefox extension that automatically skips intros on streaming platforms",
     "scripts": {
         "build": "web-ext build --source-dir . --artifacts-dir dist",

@@ -94,22 +94,12 @@ _🔄 More services coming soon! [Request a service](https://github.com/dsouravc
 <table>
 <tr>
 <td align="center">
-<img src="screenshots/page-1.jpeg" alt="Extension Popup Interface" width="300"><br>
+<img src="screenshots/image1.png" alt="Extension Popup Interface" width="300"><br>
 <sub><b>Extension Popup Interface</b></sub>
 </td>
 <td align="center">
-<img src="screenshots/page-2.jpeg" alt="Settings Panel" width="300"><br>
+<img src="screenshots/image2.png" alt="Settings Panel" width="300"><br>
 <sub><b>Settings Panel</b></sub>
-</td>
-<td align="center">
-<img src="screenshots/page-3.jpeg" alt="turn off/on a specific service" width="300"><br>
-<sub><b>turn off/on a specific service</b></sub>
-</td>
-</tr>
-<tr>
-<td align="center">
-<img src="screenshots/page-4.jpeg" alt="turn off/on all services" width="300"><br>
-<sub><b>turn off/on all services</b></sub>
 </td>
 </tr>
 </table>

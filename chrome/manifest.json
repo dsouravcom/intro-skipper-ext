@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Intro Skipper",
-    "version": "0.0.1",
+    "version": "0.0.5",
     "description": "Automatically skip intros on Netflix, Crunchyroll and other streaming services",
     "permissions": ["storage", "activeTab"],
     "host_permissions": ["https://*/*"],
