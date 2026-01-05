@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Intro Skipper",
-    "version": "0.0.5",
+    "version": "0.1.0",
     "description": "Automatically skip intros on Netflix, Crunchyroll and other streaming services",
     "browser_specific_settings": {
         "gecko": {
