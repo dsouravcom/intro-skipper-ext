@@ -14,7 +14,8 @@
         "storage",
         "activeTab",
         "*://*.netflix.com/*",
-        "*://*.crunchyroll.com/*"
+        "*://*.crunchyroll.com/*",
+        "*://*.hotstar.com/*"
     ],
 
     "background": {
@@ -31,6 +32,12 @@
         {
             "matches": ["*://*.crunchyroll.com/*"],
             "js": ["content-scripts/crunchyroll.js"],
+            "run_at": "document_end",
+            "all_frames": true
+        },
+        {
+            "matches": ["*://*.hotstar.com/*"],
+            "js": ["content-scripts/hotstar.js"],
             "run_at": "document_end",
             "all_frames": true
         }

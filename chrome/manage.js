@@ -5,6 +5,7 @@ let globalEnabled = true;
 const DETECTED_SERVICES = {
     "netflix.com": { name: "Netflix" },
     "crunchyroll.com": { name: "Crunchyroll" },
+    "hotstar.com": { name: "Hotstar" },
     // Services are added dynamically when user visits them
 };
 

@@ -50,7 +50,7 @@
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------- | ---------- |
 | **Netflix**     | <img src="https://img.shields.io/badge/Netflix-E50914?style=for-the-badge&logo=netflix&logoColor=white" alt="Netflix">                    | ✅ Intro  | 🟢 Active  |
 | **Crunchyroll** | <img src="https://img.shields.io/badge/Crunchyroll-F47521?style=for-the-badge&logo=crunchyroll&logoColor=white" alt="Crunchyroll">        | ✅ Intro  | 🟢 Active  |
-| **Disney+**     | <img src="https://img.shields.io/badge/Hotstar-blue?logo=hotstar&logoColor=white" alt="Disney+">                                          | ⏳ Intro  | 🟡 Planned |
+| **Hotstar**     | <img src="https://img.shields.io/badge/Hotstar-113CCF?style=for-the-badge&logo=disneyplus&logoColor=white" alt="Hotstar">                 | ✅ Intro  | 🟢 Active  |
 | **Prime Video** | <img src="https://img.shields.io/badge/Prime%20Video-232F3E?style=for-the-badge&logo=amazonprimevideo&logoColor=white" alt="Prime Video"> | ⏳ Intro  | 🟡 Planned |
 
 </div>
@@ -178,6 +178,7 @@ intro-skipper/
 │   ├── License                     # License file
 │   ├── content-scripts/            # Content scripts directory
 │   │   ├── crunchyroll.js         # Crunchyroll skip logic
+│   │   ├── hotstar.js             # Hotstar skip logic
 │   │   └── netflix.js             # Netflix skip logic
 │   └── icons/                      # Extension icons
 │       ├── icon16.png             # 16x16 icon
@@ -198,6 +199,7 @@ intro-skipper/
     ├── BROWSER_COMPARISON.md       # Browser differences documentation
     ├── content-scripts/            # Content scripts directory
     │   ├── crunchyroll.js         # Crunchyroll skip logic
+    │   ├── hotstar.js             # Hotstar skip logic
     │   └── netflix.js             # Netflix skip logic
     └── icons/                      # Extension icons
         ├── icon16.png             # 16x16 icon
