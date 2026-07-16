@@ -38,5 +38,21 @@ async function initializeExtension() {
 }
 
 function handleMessage(request, sender, sendResponse) {
+    // Fetch Crunchyroll skip markers here so the request runs with the
+    // extension's host permissions and is never blocked by page CORS.
+    if (request && request.type === "FETCH_SKIP_EVENTS" && request.mediaId) {
+        fetchSkipEvents(request.mediaId).then(
+            (data) => sendResponse({ ok: true, data }),
+            (error) => sendResponse({ ok: false, error: String(error) }),
+        );
+        return true; // keep the message channel open for the async response
+    }
     return false;
+}
+
+async function fetchSkipEvents(mediaId) {
+    const url = `https://static.crunchyroll.com/skip-events/production/${mediaId}.json`;
+    const res = await fetch(url, { credentials: "omit" });
+    if (!res.ok) return null;
+    return res.json();
 }

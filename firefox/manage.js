@@ -1,334 +1,241 @@
-// State variables
+// Settings page — full control surface for Intro Skipper (Firefox build).
+
+const SERVICES = [
+    {
+        domain: "netflix.com",
+        name: "Netflix",
+        icon: "netflix.com",
+        color: "#E50914",
+        letter: "N",
+        blurb: "Skips intros",
+    },
+    {
+        domain: "crunchyroll.com",
+        name: "Crunchyroll",
+        icon: "crunchyroll.com",
+        color: "#F47521",
+        letter: "C",
+        blurb: "Skips intro, credits & recap",
+        types: [
+            { key: "intro", label: "Intro", desc: "Opening theme" },
+            { key: "credits", label: "Credits", desc: "End credits / outro" },
+            {
+                key: "preview",
+                label: "Preview & Recap",
+                desc: "Next-episode preview and recaps",
+            },
+        ],
+    },
+    {
+        domain: "hotstar.com",
+        name: "JioHotstar",
+        icon: "hotstar.com",
+        color: "#0F1668",
+        letter: "J",
+        blurb: "Skips intros",
+    },
+];
+
+function faviconURL(domain) {
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+}
+
 let globalEnabled = true;
 
-// Dynamically detected services based on current tabs
-const DETECTED_SERVICES = {
-    "netflix.com": { name: "Netflix" },
-    "crunchyroll.com": { name: "Crunchyroll" },
-    "hotstar.com": { name: "Hotstar" },
-    // Services are added dynamically when user visits them
-};
-
-// Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", init);
 
-function init() {
-    loadSettings();
-    setupMasterToggle();
+async function init() {
+    await loadAndRender();
+    showVersion();
 }
 
-async function loadSettings() {
+function showVersion() {
     try {
-        const result = await browser.storage.sync.get(["globalEnabled"]);
-        globalEnabled = result.globalEnabled !== false;
-
-        renderServices();
-        updateMasterToggle();
-    } catch (error) {
-        console.error("Error loading settings:", error);
-        showStatus("Failed to load settings", "error");
+        const el = document.getElementById("appVersion");
+        if (el) el.textContent = "v" + browser.runtime.getManifest().version;
+    } catch (e) {
+        /* keep the static fallback */
     }
 }
 
-function setupMasterToggle() {
-    const masterToggle = document.getElementById("masterToggle");
-    if (masterToggle) {
-        masterToggle.addEventListener("change", toggleGlobalEnabled);
+async function loadAndRender() {
+    const keys = ["globalEnabled"];
+    for (const svc of SERVICES) {
+        keys.push(`${svc.domain}_enabled`);
+        for (const t of svc.types || []) keys.push(`${svc.domain}_skip_${t.key}`);
     }
-}
 
-function updateMasterToggle() {
-    const masterToggle = document.getElementById("masterToggle");
-    if (masterToggle) {
-        masterToggle.checked = globalEnabled;
-    }
-}
-
-async function toggleGlobalEnabled(event) {
+    let store = {};
     try {
-        globalEnabled = event.target.checked;
-        await browser.storage.sync.set({ globalEnabled });
-
-        // Update all service states immediately
-        updateAllServiceStates();
-
-        // Notify content scripts
-        notifyContentScripts();
-
-        const statusMessage = globalEnabled
-            ? "Extension enabled globally"
-            : "Extension disabled globally";
-        showStatus(statusMessage, "success");
-    } catch (error) {
-        console.error("Error toggling global setting:", error);
-        showStatus("Failed to update global setting", "error");
+        store = await browser.storage.sync.get(keys);
+    } catch (e) {
+        /* defaults (all on) */
     }
+
+    globalEnabled = store.globalEnabled !== false;
+    renderServices(store);
+
+    const master = document.getElementById("masterToggle");
+    master.checked = globalEnabled;
+    master.addEventListener("change", onToggle);
+    updateMasterStatus();
+    updateStates();
 }
 
-async function renderServices() {
-    const container = document.getElementById("servicesContainer");
-    container.innerHTML = "";
+function renderServices(store) {
+    const container = document.getElementById("services");
+    container.innerHTML = SERVICES.map((svc) => {
+        const on = store[`${svc.domain}_enabled`] !== false;
 
-    // Get service-specific settings
-    const serviceKeys = Object.keys(DETECTED_SERVICES).map(
-        (domain) => `${domain}_enabled`
-    );
-    const result = await browser.storage.sync.get(serviceKeys);
-
-    for (const [domain, serviceData] of Object.entries(DETECTED_SERVICES)) {
-        const serviceEnabled = result[`${domain}_enabled`] !== false;
-        const serviceCard = createServiceCard(
-            domain,
-            serviceData,
-            serviceEnabled
-        );
-        container.appendChild(serviceCard);
-    }
-}
-
-function createServiceCard(domain, serviceData, serviceEnabled) {
-    const card = document.createElement("div");
-
-    let cardClasses = "service-card";
-    if (!globalEnabled) {
-        cardClasses += " disabled";
-    } else if (!serviceEnabled) {
-        cardClasses += " service-disabled";
-    }
-    card.className = cardClasses; // Special Crunchyroll settings - removed delay setting since not needed
-    let crunchyrollSettings = "";
-    if (domain === "crunchyroll.com") {
-        crunchyrollSettings = ``;
-    } // Create elements safely instead of using innerHTML
-    const serviceHeader = document.createElement("div");
-    serviceHeader.className = "service-header";
-
-    const serviceInfo = document.createElement("div");
-    serviceInfo.className = "service-info";
-
-    const serviceName = document.createElement("h3");
-    serviceName.textContent = serviceData.name;
-
-    const serviceDomain = document.createElement("div");
-    serviceDomain.className = "service-domain";
-    serviceDomain.textContent = domain;
-
-    serviceInfo.appendChild(serviceName);
-    serviceInfo.appendChild(serviceDomain);
-
-    const serviceToggle = document.createElement("label");
-    serviceToggle.className = "service-toggle";
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = serviceEnabled;
-    checkbox.setAttribute("data-domain", domain);
-    checkbox.className = "service-checkbox";
-    checkbox.disabled = !globalEnabled;
-
-    const toggleSlider = document.createElement("span");
-    toggleSlider.className = "toggle-slider";
-
-    serviceToggle.appendChild(checkbox);
-    serviceToggle.appendChild(toggleSlider);
-
-    serviceHeader.appendChild(serviceInfo);
-    serviceHeader.appendChild(serviceToggle);
-
-    const buttonsGrid = document.createElement("div");
-    buttonsGrid.className = "buttons-grid";
-
-    const buttonItem = document.createElement("div");
-    buttonItem.className = `button-item ${
-        !serviceEnabled || !globalEnabled ? "disabled" : ""
-    }`;
-
-    const buttonInfo = document.createElement("div");
-    buttonInfo.className = "button-info";
-
-    const buttonText = document.createElement("div");
-    buttonText.className = "button-text";
-    buttonText.textContent = "Skip Intro";
-
-    const buttonType = document.createElement("div");
-    buttonType.className = "button-type";
-    buttonType.textContent = "intro";
-
-    buttonInfo.appendChild(buttonText);
-    buttonInfo.appendChild(buttonType);
-
-    const buttonStatus = document.createElement("div");
-    buttonStatus.className = "button-status";
-    buttonStatus.textContent =
-        serviceEnabled && globalEnabled ? "Enabled" : "Disabled";
-    buttonItem.appendChild(buttonInfo);
-    buttonItem.appendChild(buttonStatus);
-
-    buttonsGrid.appendChild(buttonItem);
-
-    // Clear card and append all elements
-    card.innerHTML = "";
-    card.appendChild(serviceHeader);
-    card.appendChild(buttonsGrid);
-
-    // Add event listener for service toggle
-    const serviceCheckbox = card.querySelector(".service-checkbox");
-    if (serviceCheckbox) {
-        serviceCheckbox.addEventListener("change", handleServiceToggle);
-        serviceCheckbox.addEventListener("click", handleServiceClick);
-    }
-
-    return card;
-}
-
-function handleServiceToggle(e) {
-    if (!e.target.disabled) {
-        toggleService(e.target.dataset.domain, e.target.checked);
-    }
-}
-
-function handleServiceClick(e) {
-    if (e.target.disabled) {
-        e.preventDefault();
-        showStatus(
-            "Cannot toggle service - master control is disabled",
-            "error"
-        );
-        return false;
-    }
-}
-
-async function toggleService(domain, enabled) {
-    try {
-        if (!globalEnabled) {
-            showStatus(
-                "Cannot toggle service - master control is disabled",
-                "error"
-            );
-            return;
+        let types = "";
+        if (svc.types) {
+            types =
+                `<div class="types">` +
+                svc.types
+                    .map((t) => {
+                        const tOn =
+                            store[`${svc.domain}_skip_${t.key}`] !== false;
+                        return `
+                        <div class="type-row">
+                            <div class="type-meta">
+                                <div class="type-label">${t.label}</div>
+                                <div class="type-desc">${t.desc}</div>
+                            </div>
+                            ${switchHTML(tOn, {
+                                role: "type",
+                                domain: svc.domain,
+                                type: t.key,
+                            })}
+                        </div>`;
+                    })
+                    .join("") +
+                `</div>`;
         }
 
-        await browser.storage.sync.set({ [`${domain}_enabled`]: enabled });
+        return `
+            <div class="card service-card" data-domain="${svc.domain}">
+                <div class="svc-head">
+                    <span class="avatar" data-letter="${svc.letter}" data-color="${svc.color}"><img src="${faviconURL(
+                        svc.icon,
+                    )}" alt="" width="23" height="23"></span>
+                    <div class="svc-meta">
+                        <div class="svc-name">${svc.name}</div>
+                        <div class="svc-sub">${svc.blurb}</div>
+                    </div>
+                    ${switchHTML(on, { role: "service", domain: svc.domain })}
+                </div>
+                ${types}
+            </div>`;
+    }).join("");
 
-        // Update UI immediately
-        updateServiceButtonStates(domain, enabled);
-
-        // Notify content scripts
-        notifyContentScripts();
-
-        const serviceName = DETECTED_SERVICES[domain].name;
-        const statusMessage = enabled
-            ? `${serviceName} enabled`
-            : `${serviceName} disabled`;
-        showStatus(statusMessage, "success");
-    } catch (error) {
-        console.error("Error toggling service:", error);
-        showStatus("Failed to update service", "error");
-    }
+    container
+        .querySelectorAll(".switch input[data-role]")
+        .forEach((el) => el.addEventListener("change", onToggle));
+    wireAvatarFallbacks(container);
 }
 
-function updateServiceButtonStates(domain, serviceEnabled) {
-    const serviceCard = document
-        .querySelector(`[data-domain="${domain}"]`)
-        .closest(".service-card");
-    if (!serviceCard) return;
+function wireAvatarFallbacks(container) {
+    container.querySelectorAll(".avatar img").forEach((img) => {
+        img.addEventListener("error", () => {
+            const tile = img.parentElement;
+            tile.classList.add("fallback");
+            tile.style.background = tile.dataset.color;
+            tile.textContent = tile.dataset.letter; // replaces the broken image
+        });
+    });
+}
 
-    const buttonItems = serviceCard.querySelectorAll(".button-item");
-    const buttonStatus = serviceCard.querySelectorAll(".button-status");
+function switchHTML(checked, data) {
+    const attrs = Object.entries(data)
+        .map(([k, v]) => `data-${k}="${v}"`)
+        .join(" ");
+    const label =
+        data.role === "service" ? `Enable ${data.domain}` : `Skip ${data.type}`;
+    return `<label class="switch"><input type="checkbox" ${
+        checked ? "checked" : ""
+    } ${attrs} aria-label="${label}"><span class="track"></span></label>`;
+}
 
-    // Update service card visual state
-    if (serviceEnabled) {
-        serviceCard.classList.remove("service-disabled");
-    } else {
-        serviceCard.classList.add("service-disabled");
+async function onToggle(e) {
+    const el = e.target;
+    const role = el.dataset.role;
+    const checked = el.checked;
+
+    let update;
+    let message;
+    if (role === "master") {
+        globalEnabled = checked;
+        update = { globalEnabled: checked };
+        message = checked ? "Auto-skip enabled" : "Auto-skip paused";
+        updateMasterStatus();
+    } else if (role === "service") {
+        const name = serviceName(el.dataset.domain);
+        update = { [`${el.dataset.domain}_enabled`]: checked };
+        message = `${name} ${checked ? "enabled" : "disabled"}`;
+    } else if (role === "type") {
+        update = { [`${el.dataset.domain}_skip_${el.dataset.type}`]: checked };
+        message = `${el.dataset.type} skip ${checked ? "on" : "off"}`;
     }
 
-    buttonItems.forEach((item) => {
-        if (serviceEnabled && globalEnabled) {
-            item.classList.remove("disabled");
-        } else {
-            item.classList.add("disabled");
-        }
-    });
+    try {
+        await browser.storage.sync.set(update);
+    } catch (err) {
+        el.checked = !checked;
+        showToast("Couldn't save — try again");
+        return;
+    }
+    notifyContentScripts();
+    updateStates();
+    showToast(message);
+}
 
-    buttonStatus.forEach((status) => {
-        status.textContent =
-            serviceEnabled && globalEnabled ? "Enabled" : "Disabled";
+function updateStates() {
+    document.querySelectorAll(".service-card").forEach((card) => {
+        const svcInput = card.querySelector('[data-role="service"]');
+        const svcOn = svcInput.checked;
+        svcInput.disabled = !globalEnabled;
+        card.classList.toggle("dim", !globalEnabled);
+
+        card.querySelectorAll(".type-row").forEach((row) => {
+            const input = row.querySelector('[data-role="type"]');
+            const active = globalEnabled && svcOn;
+            input.disabled = !active;
+            row.classList.toggle("dim", !active);
+        });
     });
+}
+
+function updateMasterStatus() {
+    document.getElementById("masterStatus").textContent = globalEnabled
+        ? "Master switch — on everywhere"
+        : "Master switch — everything paused";
+}
+
+function serviceName(domain) {
+    const svc = SERVICES.find((s) => s.domain === domain);
+    return svc ? svc.name : domain;
+}
+
+let toastTimer = null;
+function showToast(text) {
+    const toast = document.getElementById("toast");
+    toast.textContent = text;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
 }
 
 async function notifyContentScripts() {
     try {
         const tabs = await browser.tabs.query({});
-        for (const tab of tabs) {
-            try {
-                await browser.tabs.sendMessage(tab.id, {
-                    action: "updateSettings",
-                });
-            } catch (error) {
-                // Ignore errors for tabs without content script
-            }
-        }
-    } catch (error) {
-        console.error("Error notifying content scripts:", error);
+        await Promise.allSettled(
+            tabs.map((tab) =>
+                browser.tabs
+                    .sendMessage(tab.id, { action: "updateSettings" })
+                    .catch(() => {}),
+            ),
+        );
+    } catch (e) {
+        /* ignore */
     }
-}
-
-function showStatus(message, type) {
-    const statusEl = document.getElementById("statusMessage");
-    if (statusEl) {
-        statusEl.textContent = message;
-        statusEl.className = `status-message status-${type}`;
-        statusEl.style.display = "block";
-
-        setTimeout(() => {
-            statusEl.style.display = "none";
-        }, 3000);
-    }
-}
-
-function updateAllServiceStates() {
-    const serviceCards = document.querySelectorAll(".service-card");
-
-    serviceCards.forEach((card) => {
-        const serviceCheckbox = card.querySelector(".service-checkbox");
-        const buttonItems = card.querySelectorAll(".button-item");
-        const buttonStatus = card.querySelectorAll(".button-status");
-
-        if (serviceCheckbox) {
-            const domain = serviceCheckbox.dataset.domain;
-            const serviceEnabled = serviceCheckbox.checked;
-
-            // Update card visual state
-            if (!globalEnabled) {
-                card.classList.add("disabled");
-                card.classList.remove("service-disabled");
-            } else {
-                card.classList.remove("disabled");
-                if (!serviceEnabled) {
-                    card.classList.add("service-disabled");
-                } else {
-                    card.classList.remove("service-disabled");
-                }
-            }
-
-            // Update service checkbox
-            serviceCheckbox.disabled = !globalEnabled;
-
-            // Update button states
-            buttonItems.forEach((item) => {
-                const shouldBeDisabled = !globalEnabled || !serviceEnabled;
-                if (shouldBeDisabled) {
-                    item.classList.add("disabled");
-                } else {
-                    item.classList.remove("disabled");
-                }
-            });
-
-            buttonStatus.forEach((status) => {
-                status.textContent =
-                    globalEnabled && serviceEnabled ? "Enabled" : "Disabled";
-            });
-        }
-    });
 }

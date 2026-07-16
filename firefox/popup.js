@@ -1,89 +1,256 @@
-// DOM elements
-let globalToggle;
-let status;
-let manageBtn;
+// Popup — shows controls for the site you're currently on (Firefox build).
 
-// Initialize popup when DOM is ready
+const SERVICES = [
+    {
+        domain: "netflix.com",
+        name: "Netflix",
+        icon: "netflix.com",
+        letter: "N",
+        color: "#E50914",
+        blurb: "Skips intros",
+    },
+    {
+        domain: "crunchyroll.com",
+        name: "Crunchyroll",
+        icon: "crunchyroll.com",
+        letter: "C",
+        color: "#F47521",
+        blurb: "Skips intro, credits & recap",
+        types: [
+            { key: "intro", label: "Intro" },
+            { key: "credits", label: "Credits" },
+            { key: "preview", label: "Preview & Recap" },
+        ],
+    },
+    {
+        domain: "hotstar.com",
+        name: "JioHotstar",
+        icon: "hotstar.com",
+        letter: "J",
+        color: "#0F1668",
+        blurb: "Skips intros",
+    },
+];
+
+let globalEnabled = true;
+
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
-    try {
-        // Get DOM elements
-        globalToggle = document.getElementById("globalToggle");
-        status = document.getElementById("status");
-        manageBtn = document.getElementById("manageBtn");
+    document
+        .getElementById("openSettings")
+        .addEventListener("click", openSettings);
+    await loadAndRender();
+}
 
-        await loadSettings();
-        setupEventListeners();
-    } catch (error) {
-        console.error("Popup initialization failed:", error);
-        showError("Failed to initialize popup");
+function faviconURL(domain) {
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+}
+
+async function loadAndRender() {
+    const keys = ["globalEnabled"];
+    for (const svc of SERVICES) {
+        keys.push(`${svc.domain}_enabled`);
+        for (const t of svc.types || []) keys.push(`${svc.domain}_skip_${t.key}`);
+    }
+
+    let store = {};
+    try {
+        store = await browser.storage.sync.get(keys);
+    } catch (e) {
+        /* defaults (all on) */
+    }
+
+    globalEnabled = store.globalEnabled !== false;
+    const master = document.getElementById("masterToggle");
+    master.checked = globalEnabled;
+    master.addEventListener("change", onToggle);
+    updateMasterStatus();
+
+    const active = await getActiveService();
+    renderBody(store, active);
+}
+
+async function getActiveService() {
+    try {
+        const [tab] = await browser.tabs.query({
+            active: true,
+            currentWindow: true,
+        });
+        if (!tab || !tab.url) return { status: "unknown" };
+        const host = new URL(tab.url).hostname;
+        const svc = SERVICES.find((s) => host.endsWith(s.domain));
+        return svc ? { status: "match", svc } : { status: "nomatch" };
+    } catch (e) {
+        return { status: "error" };
     }
 }
 
-function setupEventListeners() {
-    globalToggle.addEventListener("change", toggleGlobal);
-    manageBtn.addEventListener("click", openManagePage);
+function renderBody(store, active) {
+    const container = document.getElementById("services");
+
+    // Not on a supported streaming site → friendly empty state.
+    if (active.status === "nomatch" || active.status === "unknown") {
+        container.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon" aria-hidden="true">📺</div>
+                <div class="empty-title">Nothing to skip here</div>
+                <div class="empty-text">Open Netflix, Crunchyroll or JioHotstar and this popup will show its controls.</div>
+            </div>`;
+        return;
+    }
+
+    // On a supported site → just that site. If detection failed, show all.
+    const list = active.status === "match" ? [active.svc] : SERVICES.slice();
+
+    container.innerHTML = list
+        .map((svc) => cardHTML(store, svc, active.status === "match"))
+        .join("");
+
+    container
+        .querySelectorAll(".switch input[data-role]")
+        .forEach((el) => el.addEventListener("change", onToggle));
+    wireAvatarFallbacks(container);
+    updateStates();
 }
 
-async function loadSettings() {
-    try {
-        const result = await browser.storage.sync.get(["globalEnabled"]);
-        const globalEnabled = result.globalEnabled !== false;
+function cardHTML(store, svc, isActiveTab) {
+    const on = store[`${svc.domain}_enabled`] !== false;
 
-        globalToggle.checked = globalEnabled;
-        updateStatus(globalEnabled);
-    } catch (error) {
-        console.error("Error loading settings:", error);
-        showError("Error loading settings");
+    let types = "";
+    if (svc.types) {
+        types =
+            `<div class="types">` +
+            svc.types
+                .map((t) => {
+                    const tOn = store[`${svc.domain}_skip_${t.key}`] !== false;
+                    return `
+                    <div class="type-row">
+                        <span class="type-label">${t.label}</span>
+                        ${switchHTML(tOn, {
+                            role: "type",
+                            domain: svc.domain,
+                            type: t.key,
+                        })}
+                    </div>`;
+                })
+                .join("") +
+            `</div>`;
     }
+
+    const pill = isActiveTab ? `<span class="pill">This tab</span>` : "";
+
+    return `
+        <div class="service-card${isActiveTab ? " here" : ""}" data-domain="${svc.domain}">
+            <div class="svc-head">
+                ${avatarHTML(svc)}
+                <div class="svc-meta">
+                    <div class="svc-name">${svc.name} ${pill}</div>
+                    <div class="svc-sub">${svc.blurb}</div>
+                </div>
+                ${switchHTML(on, { role: "service", domain: svc.domain })}
+            </div>
+            ${types}
+        </div>`;
 }
 
-async function toggleGlobal(e) {
-    const enabled = e.target.checked;
+function avatarHTML(svc) {
+    return `<span class="avatar" data-letter="${svc.letter}" data-color="${svc.color}"><img src="${faviconURL(
+        svc.icon,
+    )}" alt="" width="22" height="22"></span>`;
+}
+
+function wireAvatarFallbacks(container) {
+    container.querySelectorAll(".avatar img").forEach((img) => {
+        img.addEventListener("error", () => {
+            const tile = img.parentElement;
+            tile.classList.add("fallback");
+            tile.style.background = tile.dataset.color;
+            tile.textContent = tile.dataset.letter; // replaces the broken image
+        });
+    });
+}
+
+function switchHTML(checked, data) {
+    const attrs = Object.entries(data)
+        .map(([k, v]) => `data-${k}="${v}"`)
+        .join(" ");
+    const label =
+        data.role === "service" ? `Enable ${data.domain}` : `Skip ${data.type}`;
+    return `<label class="switch"><input type="checkbox" ${
+        checked ? "checked" : ""
+    } ${attrs} aria-label="${label}"><span class="track"></span></label>`;
+}
+
+async function onToggle(e) {
+    const el = e.target;
+    const role = el.dataset.role;
+    const checked = el.checked;
+
+    let update;
+    if (role === "master") {
+        globalEnabled = checked;
+        update = { globalEnabled: checked };
+        updateMasterStatus();
+    } else if (role === "service") {
+        update = { [`${el.dataset.domain}_enabled`]: checked };
+    } else if (role === "type") {
+        update = {
+            [`${el.dataset.domain}_skip_${el.dataset.type}`]: checked,
+        };
+    }
 
     try {
-        await browser.storage.sync.set({ globalEnabled: enabled });
-        updateStatus(enabled);
-
-        // Notify all content scripts
-        await notifyContentScripts();
-    } catch (error) {
-        console.error("Error saving settings:", error);
-        showError("Error saving settings");
-        // Revert toggle on error
-        globalToggle.checked = !enabled;
+        await browser.storage.sync.set(update);
+    } catch (err) {
+        el.checked = !checked; // revert on failure
+        return;
     }
+    notifyContentScripts();
+    updateStates();
+}
+
+// Update dim / disabled states without rebuilding (keeps switch animations smooth).
+function updateStates() {
+    document.querySelectorAll(".service-card").forEach((card) => {
+        const svcInput = card.querySelector('[data-role="service"]');
+        if (!svcInput) return;
+        const svcOn = svcInput.checked;
+        svcInput.disabled = !globalEnabled;
+        card.classList.toggle("dim", !globalEnabled);
+
+        card.querySelectorAll(".type-row").forEach((row) => {
+            const input = row.querySelector('[data-role="type"]');
+            const active = globalEnabled && svcOn;
+            input.disabled = !active;
+            row.classList.toggle("dim", !active);
+        });
+    });
+}
+
+function updateMasterStatus() {
+    const status = document.getElementById("masterStatus");
+    status.textContent = globalEnabled ? "Auto-skip is on" : "Auto-skip is off";
+    status.classList.toggle("on", globalEnabled);
 }
 
 async function notifyContentScripts() {
     try {
         const tabs = await browser.tabs.query({});
-        const notifications = tabs.map(
-            (tab) =>
+        await Promise.allSettled(
+            tabs.map((tab) =>
                 browser.tabs
                     .sendMessage(tab.id, { action: "updateSettings" })
-                    .catch(() => {}) // Ignore errors for tabs without content script
+                    .catch(() => {}),
+            ),
         );
-        await Promise.allSettled(notifications);
-    } catch (error) {
-        console.error("Error notifying content scripts:", error);
+    } catch (e) {
+        /* ignore */
     }
 }
 
-function updateStatus(enabled) {
-    status.textContent = enabled ? "Auto Skip: Enabled" : "Auto Skip: Disabled";
-    status.className = enabled ? "status enabled" : "status disabled";
-}
-
-function showError(message) {
-    status.textContent = message;
-    status.className = "status disabled";
-}
-
-function openManagePage() {
-    browser.tabs.create({
-        url: browser.runtime.getURL("manage.html"),
-    });
+function openSettings() {
+    if (browser.runtime.openOptionsPage) browser.runtime.openOptionsPage();
+    else browser.tabs.create({ url: browser.runtime.getURL("manage.html") });
     window.close();
 }
